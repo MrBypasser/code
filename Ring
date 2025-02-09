@@ -1,10 +1,26 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local RootPart = Character:WaitForChild("HumanoidRootPart")
 local Mouse = LocalPlayer:GetMouse()
+
+-- Function to re-execute the script
+local function reExecute()
+    local scriptUrl = "https://raw.githubusercontent.com/MrBypasser/code/refs/heads/main/Ring"
+    local success, response = pcall(function()
+        return game:HttpGet(scriptUrl, true)
+    end)
+    
+    if success then
+        loadstring(response)()
+    else
+        warn("Failed to reload script:", response)
+    end
+end
 
 -- GUI Setup
 local ScreenGui = Instance.new("ScreenGui")
@@ -13,82 +29,59 @@ ScreenGui.ResetOnSpawn = false
 
 local Frame = Instance.new("Frame")
 Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Frame.Size = UDim2.new(0, 300, 0, 200)
-Frame.Position = UDim2.new(0.5, -150, 0.2, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Frame.Size = UDim2.new(0, 250, 0, 180)
+Frame.Position = UDim2.new(0.4, 0, 0.2, 0)
 Frame.Active = true
 Frame.Draggable = true
 
 local UICorner = Instance.new("UICorner", Frame)
-UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.CornerRadius = UDim.new(0, 8)
 
--- Title Label
 local Title = Instance.new("TextLabel", Frame)
+Title.Parent = Frame
 Title.Text = "Ring of DEATH"
 Title.Font = Enum.Font.GothamBold
-Title.TextSize = 22
+Title.TextSize = 18
 Title.TextColor3 = Color3.fromRGB(255, 0, 0)
-Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Size = UDim2.new(1, 0, 0, 30)
 Title.BackgroundTransparency = 1
 
--- Toggle Button
 local ToggleButton = Instance.new("TextButton", Frame)
+ToggleButton.Parent = Frame
 ToggleButton.Text = "Activate"
 ToggleButton.Font = Enum.Font.GothamBold
-ToggleButton.TextSize = 18
+ToggleButton.TextSize = 16
 ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton.Size = UDim2.new(1, -20, 0, 40)
-ToggleButton.Position = UDim2.new(0, 10, 0, 50)
-ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-local UICornerToggle = Instance.new("UICorner", ToggleButton)
-UICornerToggle.CornerRadius = UDim.new(0, 8)
+ToggleButton.Size = UDim2.new(1, -10, 0, 30)
+ToggleButton.Position = UDim2.new(0, 5, 0, 40)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 
--- Speed Label & Input
-local SpeedLabel = Instance.new("TextLabel", Frame)
-SpeedLabel.Text = "Speed:"
-SpeedLabel.Font = Enum.Font.Gotham
-SpeedLabel.TextSize = 16
-SpeedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-SpeedLabel.Size = UDim2.new(0, 100, 0, 30)
-SpeedLabel.Position = UDim2.new(0, 10, 0, 100)
-SpeedLabel.BackgroundTransparency = 1
+local SpeedSlider = Instance.new("TextBox", Frame)
+SpeedSlider.Text = "100"
+SpeedSlider.Font = Enum.Font.Gotham
+SpeedSlider.TextSize = 14
+SpeedSlider.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedSlider.Size = UDim2.new(1, -10, 0, 20)
+SpeedSlider.Position = UDim2.new(0, 5, 0, 110)
+SpeedSlider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 
-local SpeedInput = Instance.new("TextBox", Frame)
-SpeedInput.Text = "100"
-SpeedInput.Font = Enum.Font.Gotham
-SpeedInput.TextSize = 16
-SpeedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-SpeedInput.Size = UDim2.new(0, 180, 0, 30)
-SpeedInput.Position = UDim2.new(0, 120, 0, 100)
-SpeedInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+local DistanceSlider = Instance.new("TextBox", Frame)
+DistanceSlider.Text = "20"
+DistanceSlider.Font = Enum.Font.Gotham
+DistanceSlider.TextSize = 14
+DistanceSlider.TextColor3 = Color3.fromRGB(255, 255, 255)
+DistanceSlider.Size = UDim2.new(1, -10, 0, 20)
+DistanceSlider.Position = UDim2.new(0, 5, 0, 140)
+DistanceSlider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 
--- Range Label & Input
-local RangeLabel = Instance.new("TextLabel", Frame)
-RangeLabel.Text = "Range:"
-RangeLabel.Font = Enum.Font.Gotham
-RangeLabel.TextSize = 16
-RangeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-RangeLabel.Size = UDim2.new(0, 100, 0, 30)
-RangeLabel.Position = UDim2.new(0, 10, 0, 140)
-RangeLabel.BackgroundTransparency = 1
-
-local RangeInput = Instance.new("TextBox", Frame)
-RangeInput.Text = "20"
-RangeInput.Font = Enum.Font.Gotham
-RangeInput.TextSize = 16
-RangeInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-RangeInput.Size = UDim2.new(0, 180, 0, 30)
-RangeInput.Position = UDim2.new(0, 120, 0, 140)
-RangeInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-
--- Variables
+-- Ring Functionality
 local active = false
 local speed = 100
-local range = 20
+local distance = 20
 local unanchoredParts = {}
 local movers = {}
 
--- Collect all unanchored parts in the game
 local function collectParts()
     unanchoredParts = {}
     for _, part in ipairs(workspace:GetDescendants()) do
@@ -105,7 +98,6 @@ local function collectParts()
     end
 end
 
--- Create BodyPosition movers for parts
 local function createMovers()
     movers = {}
     for _, part in ipairs(unanchoredParts) do
@@ -118,7 +110,6 @@ local function createMovers()
     end
 end
 
--- Start the Ring mode
 local function startRing()
     if active then return end
     active = true
@@ -128,7 +119,7 @@ local function startRing()
     local angle = 0
     local connection
     connection = RunService.Heartbeat:Connect(function(delta)
-        if not active then
+        if not active or not Character or not RootPart or Character:FindFirstChild("Humanoid").Health <= 0 then
             connection:Disconnect()
             for _, mover in ipairs(movers) do
                 mover:Destroy()
@@ -139,13 +130,12 @@ local function startRing()
         angle = angle + delta * speed
         for i, mover in ipairs(movers) do
             local theta = angle + (i / #movers) * math.pi * 2
-            local offset = Vector3.new(math.cos(theta) * range, 5, math.sin(theta) * range)
+            local offset = Vector3.new(math.cos(theta) * distance, 5, math.sin(theta) * distance)
             mover.Position = RootPart.Position + offset
         end
     end)
 end
 
--- Stop the Ring mode
 local function stopRing()
     active = false
     for _, mover in ipairs(movers) do
@@ -153,7 +143,6 @@ local function stopRing()
     end
 end
 
--- Toggle Activation
 ToggleButton.MouseButton1Click:Connect(function()
     if active then
         ToggleButton.Text = "Activate"
@@ -164,31 +153,42 @@ ToggleButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Speed Input Handling
-SpeedInput.FocusLost:Connect(function()
-    local value = tonumber(SpeedInput.Text)
+SpeedSlider.FocusLost:Connect(function()
+    local value = tonumber(SpeedSlider.Text)
     if value then
         speed = math.clamp(value, 10, 500)
     else
-        SpeedInput.Text = tostring(speed)
+        SpeedSlider.Text = tostring(speed)
     end
 end)
 
--- Range Input Handling
-RangeInput.FocusLost:Connect(function()
-    local value = tonumber(RangeInput.Text)
+DistanceSlider.FocusLost:Connect(function()
+    local value = tonumber(DistanceSlider.Text)
     if value then
-        range = math.clamp(value, 5, 100)
+        distance = math.clamp(value, 5, 100)
     else
-        RangeInput.Text = tostring(range)
+        DistanceSlider.Text = tostring(distance)
     end
 end)
 
--- Teleport player to mouse position when CTRL is pressed
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.LeftControl then
-        local mousePosition = Mouse.Hit.p
-        RootPart.CFrame = CFrame.new(mousePosition)
-    end
-end)
+-- Auto Restart on Death
+local function onCharacterAdded(newCharacter)
+    Character = newCharacter
+    RootPart = Character:WaitForChild("HumanoidRootPart")
+
+    -- Wait for humanoid to load
+    local humanoid = Character:WaitForChild("Humanoid")
+    humanoid.Died:Connect(function()
+        -- Destroy GUI and stop all processes
+        ScreenGui:Destroy()
+        active = false
+        for _, mover in ipairs(movers) do
+            mover:Destroy()
+        end
+        wait(2)
+        reExecute()
+    end)
+end
+
+LocalPlayer.CharacterAdded:Connect(onCharacterAdded)
+onCharacterAdded(Character) -- Run on initial load
